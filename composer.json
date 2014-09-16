@@ -1,5 +1,6 @@
 {
     "name": "thelia/open-search-server",
+    "type": "thelia-module",
     "description": "OpenSearchServer integration",
     "license": "LGPL-3.0+",
     "authors": [

@@ -9,5 +9,5 @@ This module is still in development.
 require this module in your composer.json file using the command line tool :
 
 ```
-$ composer require thelia/open-search-server:1.0.*@dev
+$ composer require "thelia/open-search-server":"1.0.*@dev"
 ```
