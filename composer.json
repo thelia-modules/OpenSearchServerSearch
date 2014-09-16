@@ -1,15 +1,21 @@
 {
     "name": "thelia/open-search-server",
     "description": "OpenSearchServer integration",
-    "require": {
-        "thelia/installer": "~1.0",
-        "opensearchserver/opensearchserver": "3.0.*"
-    },
     "license": "LGPL-3.0+",
     "authors": [
         {
             "name": "Manuel Raynaud",
             "email": "manu@thelia.net"
         }
-    ]
+    ],
+    "require": {
+        "thelia/installer": "~1.0",
+        "opensearchserver/opensearchserver": "3.0.*"
+    },
+    "extra": {
+        "installer-name": "OpenSearchServer",
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
 }
