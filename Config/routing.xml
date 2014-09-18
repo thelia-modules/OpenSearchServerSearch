@@ -4,28 +4,12 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <!--
-
-    if a /admin/module/opensearchserver/ route is provided, a "Configuration" button will be displayed
-    for the module in the module list. Clicking this button will invoke this route.
-
-    <route id="my_route_id" path="/admin/module/opensearchserver">
-        <default key="_controller">OpenSearchServer\Full\Class\Name\Of\YourConfigurationController::methodName</default>
+    <route id="opensearchserver.admin" path="/admin/module/OpenSearchServerSearch/configure" methods="post">
+        <default key="_controller">OpenSearchServerSearch\Controller\Admin\OpenSearchServerSearchAdminController::configure</default>
     </route>
 
-    <route id="my_route_id" path="/admin/module/opensearchserver/route-name">
-        <default key="_controller">OpenSearchServer\Full\Class\Name\Of\YourAdminController::methodName</default>
+    <route id="opensearchserver.search" path="/search">
+        <default key="_controller">OpenSearchServerSearch\Controller\Front\OpenSearchServerSearchFrontController::search</default>
     </route>
-
-    <route id="my_route_id" path="/my/route/name">
-        <default key="_controller">OpenSearchServer\Full\Class\Name\Of\YourOtherController::methodName</default>
-    </route>
-
-    ...add as many routes as required.
-
-    <route>
-    ...
-    </route>
-    -->
 
 </routes>
