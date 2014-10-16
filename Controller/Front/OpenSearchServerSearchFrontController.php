@@ -25,10 +25,10 @@ namespace OpenSearchServerSearch\Controller\Front;
 
 
 use Front\Front;
+use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Front\BaseFrontController;
 use OpenSearchServerSearch\Form\ConfigurationForm;
-use OpenSearchServerSearch\Model\OpenSearchServerConfigQuery;
 use OpenSearchServerSearch\OpenSearchServerSearch;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -46,7 +46,35 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
 {
     
     public function search() {
-        return $this->render('search', array('module_code' => 'OpenSearchServerSearch'));
+        //get keywords
+        $request = $this->getRequest();
+        $keywords = $request->query->get('q', null);
+        
+        //run search
+        $url = OpensearchserverConfigQuery::read('hostname');
+        $login = OpensearchserverConfigQuery::read('login');
+        $apiKey = OpensearchserverConfigQuery::read('apikey');
+        
+        $index = OpensearchserverConfigQuery::read('index_name');
+        $queryTemplate = OpensearchserverConfigQuery::read('query_template');
+
+        //create handler for requests
+        $oss_api = new \OpenSearchServer\Handler(array('url' => $url, 'key' => $apiKey, 'login' => $login ));
+        //create search request
+        $request = new \OpenSearchServer\Search\Field\Search();
+        $request->index($index)
+                ->template($queryTemplate)
+                ->lang('FRENCH')
+                ->enableLog()
+                ->query($keywords);
+        $response = $oss_api->submit($request);
+                
+        //display results
+        return $this->render('oss_results', array(
+        	'module_code' => 'OpenSearchServerSearch',
+            'keywords' => $keywords,
+            'results' => $response->getResults()
+        ));
     }
     
 }
