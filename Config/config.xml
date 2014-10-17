@@ -9,19 +9,20 @@
         <form name="opensearchserversearch.configuration.form" class="OpenSearchServerSearch\Form\ConfigurationForm" />
     </forms>
 
-
+    <services>
+        <service id="module.action.updateProduct" class="OpenSearchServerSearch\Listener\OpenSearchServerSearchProductListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="module.action.createProduct" class="OpenSearchServerSearch\Listener\OpenSearchServerSearchProductListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+    </services>
 
     <loops>
         <!-- sample definition
         <loop name="MySuperLoop" class="OpenSearchServer\Loop\MySuperLoop" />
         -->
     </loops>
-
-    <forms>
-        <!--
-        <form name="MyFormName" class="OpenSearchServer\Form\MySuperForm" />
-        -->
-    </forms>
 
     <commands>
         <!--

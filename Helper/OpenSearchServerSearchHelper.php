@@ -21,57 +21,33 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace OpenSearchServerSearch\Controller\Front;
+namespace OpenSearchServerSearch\Helper;
 
 
-use Front\Front;
 use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Controller\Front\BaseFrontController;
-use OpenSearchServerSearch\Form\ConfigurationForm;
-use OpenSearchServerSearch\OpenSearchServerSearch;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\Exception\FormValidationException;
-use Thelia\Tools\URL;
-use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Template\ParserInterface;
 
 /**
- * Class OpenSearchServerSearchFrontController
- * @package OpenSearchServerSearch\Controller\Front
+ * Class OpenSearchServerSearchHelper
+ * @package OpenSearchServerSearch\Helper
  * @author Alexandre Toyer <alexandre.toyer@open-search-server.com>
  */
-class OpenSearchServerSearchFrontController extends BaseFrontController
+class OpenSearchServerSearchHelper
 {
     
-    public function search() {
-        //get keywords
-        $request = $this->getRequest();
-        $keywords = $request->query->get('q', null);
-        
-        //run search
-        $index = OpensearchserverConfigQuery::read('index_name');
-        $queryTemplate = OpensearchserverConfigQuery::read('query_template');
+    public static function getHandler() {
+        $url = OpensearchserverConfigQuery::read('hostname');
+        $login = OpensearchserverConfigQuery::read('login');
+        $apiKey = OpensearchserverConfigQuery::read('apikey');
 
         //create handler for requests
-        $oss_api = \OpenSearchServerSearch\Helper\OpenSearchServerSearchHelper::getHandler();
+        $ossApi = new \OpenSearchServer\Handler(array('url' => $url, 'key' => $apiKey, 'login' => $login ));
         
-        //create search request
-        $request = new \OpenSearchServer\Search\Field\Search();
-        $request->index($index)
-                ->template($queryTemplate)
-                ->lang('FRENCH')
-                ->enableLog()
-                ->query($keywords);
-        $response = $oss_api->submit($request);
-                
-        //display results
-        return $this->render('oss_results', array(
-        	'module_code' => 'OpenSearchServerSearch',
-            'keywords' => $keywords,
-            'results' => $response->getResults()
-        ));
+        return $ossApi;
+    }
+    
+    public static function makeProductUniqueId(\Thelia\Model\Base\Product $product) {
+        //concatenate locale + ref
+        return $product->getCurrentTranslation()->getLocale().'_'.$product->getRef();
     }
     
 }
