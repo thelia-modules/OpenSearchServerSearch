@@ -23,6 +23,8 @@
 
 namespace OpenSearchServerSearch\Listener;
 
+use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
+
 use Thelia\Log\Tlog;
 
 use Thelia\Core\Event\TheliaEvents;
@@ -37,49 +39,12 @@ use OpenSearchServerSearch\Helper\OpenSearchServerSearchHelper;
 class OpenSearchServerSearchProductListener implements EventSubscriberInterface
 {
 
-    public function indexProduct(ProductEvent $event) {
+    public function indexProduct($event) {
         //var_dump($event->getProduct()->getCurrentTranslation());
+        //var_dump($event);
         //var_dump($event->getProduct());exit;
 
-        /************************************
-         * Get name of index and handler to work with OSS API
-         ************************************/
-        $index = OpensearchserverConfigQuery::read('index_name');
-        $oss_api = OpenSearchServerSearchHelper::getHandler();
-        
-        /************************************
-         * Create/update document
-         ************************************/
-        $product = $event->getProduct();
-        $document = new \OpenSearchServer\Document\Document();
-        //TODO : complete handling of language
-        switch($product->getCurrentTranslation()->getLocale()) {
-            case 'fr_FR':
-                $document->lang(\OpenSearchServer\Request::LANG_FR);
-                break;
-            case 'en_EN':
-            case 'en_US':
-                $document->lang(\OpenSearchServer\Request::LANG_EN);
-                break;
-        }
-        $document->field('id', OpenSearchServerSearchHelper::makeProductUniqueId($product))
-                 ->field('title', $product->getTitle())
-                 ->field('locale', $product->getCurrentTranslation()->getLocale())
-                 ->field('description', $product->getDescription())
-                 ->field('chapo', $product->getChapo())
-                 ->field('reference', $product->getRef());
-                
-        /************************************
-         * Send request to OSS
-         ************************************/ 
-        $request = new \OpenSearchServer\Document\Put();
-        $request->index($index)
-                ->addDocument($document);
-        $response = $oss_api->submit($request);
-        
-        //var_dump($oss_api->getLastRequest());
-        //var_dump($response);
-        //exit;
+        OpenSearchServerSearchHelper::indexProduct($event->getProduct());
     }
     
     /**
@@ -105,8 +70,10 @@ class OpenSearchServerSearchProductListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::PRODUCT_UPDATE => ['indexProduct', 128],
-            TheliaEvents::PRODUCT_CREATE => ['indexProduct', 128]
+            TheliaEvents::PRODUCT_UPDATE => ['indexProduct', 0],
+            TheliaEvents::PRODUCT_CREATE => ['indexProduct', 0],
+            TheliaEvents::IMAGE_SAVE => ['updateImage', 0],
+            TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT=> ['indexProduct', 0]
         );
     }
 }

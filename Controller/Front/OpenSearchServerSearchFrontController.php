@@ -50,7 +50,22 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
         $request = $this->getRequest();
         $keywords = $request->query->get('q', null);
         
-        //run search
+        //get locale
+        $locale = $request->getSession()->getLang()->getLocale();
+        //fix bug ?
+        if($locale == 'fr_FR') $locale = 'fr_Fr';
+        
+        switch($locale) {
+            case 'fr_Fr':
+            case 'fr_FR':
+                $lang = \OpenSearchServer\Request::LANG_FR;
+                break;
+            case 'en_EN':
+            case 'en_US':
+                $lang = \OpenSearchServer\Request::LANG_EN;
+                break;
+        }
+        
         $index = OpensearchserverConfigQuery::read('index_name');
         $queryTemplate = OpensearchserverConfigQuery::read('query_template');
 
@@ -61,16 +76,26 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
         $request = new \OpenSearchServer\Search\Field\Search();
         $request->index($index)
                 ->template($queryTemplate)
-                ->lang('FRENCH')
+                //set lang of keywords
+                ->lang($lang)
+                //filter to get only documents with current locale
+                ->filterField('locale', $locale)
                 ->enableLog()
                 ->query($keywords);
         $response = $oss_api->submit($request);
                 
-        //display results
+        $ids = array();
+        foreach($response->getResults() as $result) {
+            $ids[] = $result->getField('id');
+        }
+        
+        //display results      
         return $this->render('oss_results', array(
         	'module_code' => 'OpenSearchServerSearch',
             'keywords' => $keywords,
-            'results' => $response->getResults()
+            'results' => $response->getResults(),
+            'ids' => implode(',', $ids)
+        
         ));
     }
     

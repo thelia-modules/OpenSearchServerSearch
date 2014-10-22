@@ -24,6 +24,8 @@
 namespace OpenSearchServerSearch\Helper;
 
 
+use Thelia\Model\ProductPriceQuery;
+
 use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
 
 /**
@@ -33,7 +35,7 @@ use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
  */
 class OpenSearchServerSearchHelper
 {
-    
+
     public static function getHandler() {
         $url = OpensearchserverConfigQuery::read('hostname');
         $login = OpensearchserverConfigQuery::read('login');
@@ -41,13 +43,70 @@ class OpenSearchServerSearchHelper
 
         //create handler for requests
         $ossApi = new \OpenSearchServer\Handler(array('url' => $url, 'key' => $apiKey, 'login' => $login ));
-        
+
         return $ossApi;
     }
-    
-    public static function makeProductUniqueId(\Thelia\Model\Base\Product $product) {
+
+    public static function makeProductUniqueId($locale, \Thelia\Model\Base\Product $product) {
         //concatenate locale + ref
-        return $product->getCurrentTranslation()->getLocale().'_'.$product->getRef();
+        return $locale.'_'.$product->getRef();
     }
+
+    public static function indexProduct(\Thelia\Model\Base\Product $product) {
+        /************************************
+         * Get name of index and handler to work with OSS API
+         ************************************/
+        $index = OpensearchserverConfigQuery::read('index_name');
+        $oss_api = OpenSearchServerSearchHelper::getHandler();
+
+        /************************************
+         * Create/update document
+         ************************************/
+        //get price from first combination SaleElement
+        $collSaleElements  = $product->getProductSaleElementss();
+        $infos = $collSaleElements->getFirst()->toArray();
+        $price  = ProductPriceQuery::create()
+                        ->findOneByProductSaleElementsId($infos['Id'])
+                        ->toArray();
+
+        //create one document by translation
+        $translations = $product->getProductI18ns();
+        //Prepare request for OSS
+        $request = new \OpenSearchServer\Document\Put();
+        $request->index($index);
+        foreach ($translations as $translation) {
+            $document = new \OpenSearchServer\Document\Document();
+            $productI18nInfos = $translation->toArray();
+
+            //TODO : complete list of languages
+            switch($productI18nInfos['Locale']) {
+                case 'fr_Fr':
+                case 'fr_FR':
+                    $document->lang(\OpenSearchServer\Request::LANG_FR);
+                    break;
+                case 'en_EN':
+                case 'en_US':
+                    $document->lang(\OpenSearchServer\Request::LANG_EN);
+                    break;
+            }
+            
+            $document   ->field('uniqueId', OpenSearchServerSearchHelper::makeProductUniqueId($productI18nInfos['Locale'], $product))
+                        ->field('id', $product->getId())
+                        ->field('title', $productI18nInfos['Title'])
+                        ->field('locale',  $productI18nInfos['Locale'])
+                        ->field('description', $productI18nInfos['Description'])
+                        ->field('chapo', $productI18nInfos['Chapo'])
+                        ->field('price', $price['Price'])
+                        ->field('currency', $price['CurrencyId'])
+                        ->field('reference', $product->getRef());
     
+            $request->addDocument($document);
+        }
+        $response = $oss_api->submit($request);
+        
+        //var_dump($oss_api->getLastRequest());
+        //var_dump($response);
+        //exit;
+    }
+
 }

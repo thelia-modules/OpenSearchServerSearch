@@ -26,9 +26,16 @@
         <div id="category-products">
             <div class="products-content">
                 {if $results|@count > 0}
+                    <ul class="product-col-3">
+                    <!-- {*   
                     {foreach from=$results item=result}
-                        {$result->getField('title')}
+                        {include file="includes/single-product.html" TITLE=$result->getField('title') product_id=$result->getField('id') hasBtn=true hasDescription=true width="369" height="247"}
                     {/foreach}
+                    *} -->
+                    {loop type="product" id="$ids" name="product_list"  limit=$limit page=$product_page order=$product_order}
+                        {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="369" height="247"}
+                    {/loop}
+                    </ul>
                 {else}
                     <h2 class="text-center">{intl l="No results found"} </h2>
                 {/if}

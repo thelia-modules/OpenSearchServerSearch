@@ -10,10 +10,7 @@
     </forms>
 
     <services>
-        <service id="module.action.updateProduct" class="OpenSearchServerSearch\Listener\OpenSearchServerSearchProductListener">
-            <tag name="kernel.event_subscriber"/>
-        </service>
-        <service id="module.action.createProduct" class="OpenSearchServerSearch\Listener\OpenSearchServerSearchProductListener">
+        <service id="osssearch.action.updateProduct" class="OpenSearchServerSearch\Listener\OpenSearchServerSearchProductListener">
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>
