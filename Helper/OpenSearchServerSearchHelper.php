@@ -96,7 +96,7 @@ class OpenSearchServerSearchHelper
                         ->field('locale',  $productI18nInfos['Locale'])
                         ->field('description', $productI18nInfos['Description'])
                         ->field('chapo', $productI18nInfos['Chapo'])
-                        ->field('price', $price['Price'])
+                        ->field('price', self::formatPrice($price['Price']))
                         ->field('currency', $price['CurrencyId'])
                         ->field('reference', $product->getRef());
     
@@ -104,9 +104,14 @@ class OpenSearchServerSearchHelper
         }
         $response = $oss_api->submit($request);
         
+        return $response->isSuccess();
         //var_dump($oss_api->getLastRequest());
         //var_dump($response);
         //exit;
+    }
+    
+    public static function formatPrice($price) {
+        return str_replace(' ', '', $price);
     }
 
 }

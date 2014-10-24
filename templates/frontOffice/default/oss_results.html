@@ -12,18 +12,61 @@
 
 {block name="main-content"}
 <div class="main">
-<h1>Module en cours de construction OpenSearchServer</h1>
-
     {$limit={$smarty.get.limit|default:8}}
     {$product_page={$smarty.get.page|default:1}}
-    {$product_order={$smarty.get.order|default:'alpha'}}
+    {$product_order={$smarty.get.order|default:'relevancy'}}
+    
 
     <article class="col-main  {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
 
         <h1 id="main-label" class="page-header">{intl l="Search Result for"} <small>{$keywords}</small></h1>
-        {assign var="amount" value="{$results|@count}"}
-        {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={$amount}}
+        {assign var="amount" value="$total"}
+        <div class="toolbar toolbar-top" role="toolbar">
+            <div class="sorter-container">
+                <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb="{$amount}"}{else}{intl l="%nb Item" nb="{$amount}"}{/if}</span>
+
+                <span class="limiter">
+                    <label for="limit-top">{intl l="Show"}</label>
+                    <select id="limit-top" name="limit">
+                        <option value="{url path={navigate to="current"} limit="4"}" {if $limit==4}selected{/if}>4</option>
+                        <option value="{url path={navigate to="current"} limit="8"}" {if $limit==8}selected{/if}>8</option>
+                        <option value="{url path={navigate to="current"} limit="12"}" {if $limit==12}selected{/if}>12</option>
+                        <option value="{url path={navigate to="current"} limit="50"}"{if $limit==50}selected{/if}>50</option>
+                        <option value="{url path={navigate to="current"} limit="100000"}" {if $limit==100000}selected{/if}>All</option>
+                    </select>
+                    <span class="per-page">{intl l="per page"}</span>
+                </span><!-- /.limiter -->
+
+                <span class="sort-by">
+                    <label for="sortby-top">{intl l="Sort By"}</label>
+                    <select id="sortby-top" name="sortby">
+                        <option value="{url path={navigate to="current"} limit=$limit order="relevancy"}" {if $product_order=="given_id"}selected{/if}>{intl l="Relevancy"}</option>
+                        <option value="{url path={navigate to="current"} limit=$limit order="alpha"}" {if $product_order=="alpha"}selected{/if}>{intl l="Name ascending"}</option>
+                        <option value="{url path={navigate to="current"} limit=$limit order="alpha_reverse"}" {if $product_order=="alpha_reverse"}selected{/if}>{intl l="Name descending"}</option>
+                        <option value="{url path={navigate to="current"} limit=$limit order="min_price"}" {if $product_order=="min_price"}selected{/if}>{intl l="Price ascending"}</option>
+                        <option value="{url path={navigate to="current"} limit=$limit order="max_price"}" {if $product_order=="max_price"}selected{/if}>{intl l="Price descending"}</option>
+                    </select>
+                </span><!-- /.sort-by -->
+
+                <span class="view-mode">
+                    <span class="view-mode-label">{intl l="View as"}:</span>
+                    <span class="view-mode-btn">
+                        <a href="{url path={navigate to="current"} mode="grid"}" data-toggle="view" role="button" title="{intl l="Grid"}" rel="nofollow" class="btn btn-grid"><i class="icon-grid"></i></a>
+                        <a href="{url path={navigate to="current"} mode="list"}" data-toggle="view" role="button" title="{intl l="List"}" rel="nofollow" class="btn btn-list"><i class="icon-list"></i></a>
+                    </span>
+                </span><!-- /.view-mode -->
+
+            </div><!-- /.sorter -->
+        </div>
         <div id="category-products">
+        
+        {*
+        <div class="alert alert-info"> 
+            Number of pages : {$numberOfPages} <br/>
+            ids : {$ids}
+        </div>
+        *}
+        
             <div class="products-content">
                 {if $results|@count > 0}
                     <ul class="product-col-3">
@@ -32,50 +75,41 @@
                         {include file="includes/single-product.html" TITLE=$result->getField('title') product_id=$result->getField('id') hasBtn=true hasDescription=true width="369" height="247"}
                     {/foreach}
                     *} -->
-                    {loop type="product" id="$ids" name="product_list"  limit=$limit page=$product_page order=$product_order}
+                    {loop type="product" id="$ids" name="product_list"  limit=$limit page=1 order="given_id"}
                         {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="369" height="247"}
                     {/loop}
                     </ul>
+                    <div class="toolbar toolbar-bottom" role="toolbar">
+                        {if $amount > $limit}
+                            <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
+                                <strong id="pagination-label-{$toolbar}}" class="pagination-label">{intl l="Pagination"}</strong>
+                                <ul class="pagination">
+                                    <li{if $product_page le 1} class="disabled"{/if}><a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a></li>
+                                    {for $page=1 to $numberOfPages}
+                                        <li{if $page eq $product_page} class="active"{/if}><a href="{url path={navigate to="current"} page=$page }"> {$page} </a></li>
+                                        {if $page eq $numberOfPages}
+                                            <li{if $product_page eq $numberOfPages} class="disabled"{/if}><a href="{url path={navigate to="current"} page={$product_page+1} }"  title="{intl l="Next"}" class="next"><i class="icon-next"></i></a></li>
+                                        {/if}
+                                    {/for}
+                                    
+                                    {*
+                                    {pageloop rel="product_list"}
+                                        <li{if $PAGE eq $CURRENT} class="active"{/if}><a href="{url path={navigate to="current"} page=$PAGE }"> {$PAGE} </a></li>
+                                        {if $PAGE eq $LAST}
+                                            <li{if $CURRENT eq $LAST} class="disabled"{/if}><a href="{url path={navigate to="current"} page={$NEXT} }"  title="{intl l="Next"}" class="next"><i class="icon-next"></i></a></li>
+                                        {/if}
+                                    {/pageloop}
+                                    *}
+                                </ul>
+                            </div>
+                        {/if}
+                    </div><!-- /.toolbar toolbar-bottom -->
                 {else}
                     <h2 class="text-center">{intl l="No results found"} </h2>
                 {/if}
             </div>
         </div>
         
-    </article>
-
-
-
-    <hr/><hr/>
-
-
-
-    {$limit={$smarty.get.limit|default:8}}
-    {$product_page={$smarty.get.page|default:1}}
-    {$product_order={$smarty.get.order|default:'alpha'}}
-
-    <article class="col-main  {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
-
-        <h1 id="main-label" class="page-header">{intl l="Search Result for"} <small>{$smarty.get.q}</small></h1>
-        {assign var="amount" value="{count type="product" title="{$smarty.get.q}"}"}
-        {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={$amount}}
-        <div id="category-products">
-            <div class="products-content">
-                {ifloop rel="product_list"}
-                    <ul class="product-col-3">
-                        {loop type="product" name="product_list" title="{$smarty.get.q}"  limit=$limit page=$product_page order=$product_order}
-                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="369" height="247"}
-                        {/loop}
-                    </ul>
-                {/ifloop}
-                {elseloop  rel="product_list"}
-                    <h2 class="text-center">{intl l="No results found"} </h2>
-                {/elseloop}
-            </div>
-        </div><!-- /#category-products -->
-        {ifloop rel="product_list"}
-            {include file="includes/toolbar.html" toolbar="bottom" amount={$amount}}
-        {/ifloop}
     </article>
 
 </div><!-- /.layout -->

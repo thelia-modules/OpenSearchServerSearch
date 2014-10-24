@@ -46,13 +46,26 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
 {
     
     public function search() {
+        //if search with OSS has not been activated yet in module configuration page OSS is not used
+        $searchEnabled = OpensearchserverConfigQuery::read('enable_search');
+        if(!$searchEnabled) {
+            //display results      
+            return $this->render('search');
+        }
+        
         //get keywords
         $request = $this->getRequest();
         $keywords = $request->query->get('q', null);
         
+        $sort = $request->query->get('order', null);
+        
+        $page = $request->query->get('page', 1);
+        $limit = $request->query->get('limit', null);
+        $offset = ($limit == 100000) ? 0:($page - 1) * $limit;
+
         //get locale
         $locale = $request->getSession()->getLang()->getLocale();
-        //fix bug ?
+        //fix bug with FR locale?
         if($locale == 'fr_FR') $locale = 'fr_Fr';
         
         switch($locale) {
@@ -76,26 +89,51 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
         $request = new \OpenSearchServer\Search\Field\Search();
         $request->index($index)
                 ->template($queryTemplate)
+                ->start($offset)
+                ->rows($limit)
                 //set lang of keywords
                 ->lang($lang)
                 //filter to get only documents with current locale
                 ->filterField('locale', $locale)
                 ->enableLog()
                 ->query($keywords);
+        //handle sorting
+        switch($sort) {
+            case 'alpha':
+                $request->sort('titleSort', \OpenSearchServer\Search\Search::SORT_ASC);
+                break;
+            case 'alpha_reverse':
+                $request->sort('titleSort', \OpenSearchServer\Search\Search::SORT_DESC);
+                break;
+            case 'min_price':
+                $request->sort('price', \OpenSearchServer\Search\Search::SORT_ASC);
+                break;
+            case 'max_price':
+                $request->sort('price', \OpenSearchServer\Search\Search::SORT_DESC);
+                break;
+        }
+        //send query
         $response = $oss_api->submit($request);
-                
+        
         $ids = array();
         foreach($response->getResults() as $result) {
             $ids[] = $result->getField('id');
+            echo $result->getField('title').';';
         }
+        
+        
+        
+        //number of pages
+        $numberOfPages = ($limit > 0) ? round($response->getTotalNumberFound()/$limit) : 1;
         
         //display results      
         return $this->render('oss_results', array(
         	'module_code' => 'OpenSearchServerSearch',
             'keywords' => $keywords,
+            'total' => $response->getTotalNumberFound(),
             'results' => $response->getResults(),
-            'ids' => implode(',', $ids)
-        
+            'ids' => implode(',', $ids),
+            'numberOfPages' => $numberOfPages
         ));
     }
     

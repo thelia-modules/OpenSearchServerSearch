@@ -24,9 +24,12 @@
 namespace OpenSearchServerSearch\Controller\Admin;
 
 
+use Thelia\Model\Base\ProductQuery;
+
 use OpenSearchServerSearch\Form\ConfigurationForm;
 use OpenSearchServerSearch\Model\OpenSearchServerConfigQuery;
 use OpenSearchServerSearch\OpenSearchServerSearch;
+use OpenSearchServerSearch\Helper\OpenSearchServerSearchHelper;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -41,13 +44,18 @@ use Thelia\Tools\URL;
  */
 class OpenSearchServerSearchAdminController extends BaseAdminController
 {
-    public function __construct()
+
+    public function defaultAction()
     {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) return $response;
+    
+        return $this->renderTemplate();
     }
-	/**
+    
+    /**
      * @return mixed an HTTP response, or
      */
-    public function configure()
+    public function configureAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, 'OpenSearchServerSearch', AccessManager::UPDATE)) {
             return $response;
@@ -71,10 +79,49 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
                 if (is_array($value)) {
                     $value = implode(';', $value);
                 }
-
                 OpenSearchServerConfigQuery::set($name, $value);
             }
-
+        
+            //get handle to work with the API
+            $oss_api = OpenSearchServerSearchHelper::getHandler();
+            
+            //check if index exists, if not, creates it
+            $index = OpensearchserverConfigQuery::read('index_name');
+            $indexCreated = false;
+            $request = new \OpenSearchServer\Index\Exists();
+            $request->index($index);
+            $response = $oss_api->submit($request);
+            //index doesn't exist, create it
+            if(!$response->isSuccess()) {
+                $this->createIndex($index);
+                $indexCreated = true;
+            }
+            
+            //check if Analyzer "PriceAnalyzer" exists, create it if it doesn't
+            $analyzerName = 'PriceAnalyzer';
+            $request = new \OpenSearchServer\Analyzer\Get();
+            $request->index($index)
+                    ->name($analyzerName);
+            $response = $oss_api->submit($request); 
+            if(!$response->isSuccess()) {
+                $this->createAnalyzer($index, $analyzerName);
+            }
+            
+            //if index has just been created, create its schema
+            if($indexCreated) {
+                $this->createSchema($index);
+            }
+            
+            //check if query template exists, if not, creates it
+            $queryTemplate = OpensearchserverConfigQuery::read('query_template');
+            $request = new \OpenSearchServer\SearchTemplate\Get();
+            $request->index($index)
+                    ->name($queryTemplate);
+            $response = $oss_api->submit($request);
+            if(!$response->isSuccess()) {
+                $this->createQueryTemplate($index, $queryTemplate);
+            }
+            
             // Log configuration modification
             $this->adminLogAppend(
                 "opensearchserversearch.configuration.message",
@@ -92,9 +139,12 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
                 $route = '/admin/modules';
             }
 
+            
+            //$this->getRequest()->getSession()->getFlashBag()->add('notice', $this->getTranslator()->trans('Settings have been saved.'));
+            $this->getRequest()->getSession()->getFlashBag()->add('oss', 'Settings have been saved.');
+            
             $this->redirect(URL::getInstance()->absoluteUrl($route));
-
-            // An exit is performed after redirect.+
+            exit;
 
         } catch (FormValidationException $ex) {
             // Form cannot be validated. Create the error message using
@@ -116,9 +166,113 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             $ex
         );
 
+        
         // Do not redirect at this point, or the error context will be lost.
         // Just redisplay the current template.
-        return $this->render('module-configure', array('module_code' => 'OpenSearchServerSearch'));
+        return $this->renderTemplate();
+    }
+
+    
+    
+	/**
+	 * Index all products
+     */
+    public function indexAllAction()
+    {
+        $products = ProductQuery::create()->findByVisible(1);
+        $count = 0;
+        foreach($products as $product) {
+            OpenSearchServerSearchHelper::indexProduct($product);
+            $count++;
+        }
+        $route = '/admin/module/OpenSearchServerSearch';
+        $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('%count products have been indexed.', array('%count' => $count)));
+        $this->redirect(URL::getInstance()->absoluteUrl($route));
+    }
+    
+    /**
+     * Create an index in OpenSearchServer's instance
+     * @param string $index Name of the index to create
+     */
+    private function createIndex($index) {
+        //get handle to work with the API
+        $oss_api = OpenSearchServerSearchHelper::getHandler();
+        
+        //create index
+        $request = new \OpenSearchServer\Index\Create();
+        $request->index($index);
+        $response = $oss_api->submit($request);
+        return $response->isSuccess();
+    }
+
+    
+	/**
+     * Create schema in an index
+     * @param string $index Name of the index to use
+     */
+    private function createSchema($index) {
+        //get handle to work with the API
+        $oss_api = OpenSearchServerSearchHelper::getHandler();
+   
+        //create schema
+        $request = new \OpenSearchServer\Field\CreateBulk(null, file_get_contents(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_schema.json'));
+        $request->index($index);
+        $response = $oss_api->submit($request);
+        
+        //set default and unique field
+        $request = new \OpenSearchServer\Field\SetDefaultUnique();
+        $request->index($index)
+                ->defaultField('title')
+                ->uniqueField('uniqueId');
+        $response = $oss_api->submit($request);
+        return $response->isSuccess();
+    }
+    
+    /**
+     * Create a template of query in an index
+     * @param string $index Name of the index to work with
+     * @param string $queryTemplate Name of the template to create
+     */
+    private function createQueryTemplate($index, $queryTemplate) {
+        //get handle to work with the API
+        $oss_api = OpenSearchServerSearchHelper::getHandler();
+        
+        $request = new \OpenSearchServer\Search\Field\Put(null, file_get_contents(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_querytemplate.json'));
+        $request->index($index)
+                ->template($queryTemplate);
+        $response = $oss_api->submit($request);
+    }
+    
+
+    
+    /**
+     * Create an analyzer
+     * @param string $index Name of the index to create
+     */
+    private function createAnalyzer($index, $analyzer) {
+        //get handle to work with the API
+        $oss_api = OpenSearchServerSearchHelper::getHandler();
+        
+        if(is_file(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_analyzer_'.$analyzer.'.json') && is_readable(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_analyzer_'.$analyzer.'.json')) {
+            $request = new \OpenSearchServer\Analyzer\Create(null, file_get_contents(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_analyzer_'.$analyzer.'.json'));
+            $request->index($index)
+                    ->name($analyzer);
+            $response = $oss_api->submit($request);
+            return $response->isSuccess();
+        }
+        return false;
+       
+    }
+    
+    protected function renderTemplate()
+    {
+        return $this->render(
+            'module-configure',
+            array(
+                'module_code' => 'OpenSearchServerSearch',
+                'flash_message' => $this->getRequest()->getSession()->getFlash('oss')
+            )
+        );
     }
     
 }

@@ -28,19 +28,41 @@
                         </div>
                     {/if}
 
+                    {if $flash_message}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">{$flash_message}</div>
+                            </div>
+                        </div>
+                    {/if}
+
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-6">
 
                             {include file="opensearchserversearch/form-field-template.html" field_name="hostname"}
                             {include file="opensearchserversearch/form-field-template.html" field_name="login"}
                             {include file="opensearchserversearch/form-field-template.html" field_name="apikey"}
                             {include file="opensearchserversearch/form-field-template.html" field_name="index_name"}
                             {include file="opensearchserversearch/form-field-template.html" field_name="query_template"}
+                            {include file="opensearchserversearch/form-field-template.html" field_name="enable_search"}
                         
                         </div>
                     </div>
+                    
+                    {include file = "includes/inner-form-toolbar.html"
+                        hide_flags = true
+                        page_url   = "{url path='/admin/module/OpenSearchServerSearch'}"
+                        close_url  = "{url path='/admin/modules'}"
+                    }
                 </form>
                 {/form}
+            </div>
+                        
+            <div class="col-md-12">
+                <h3>Actions</h3>
+                <form action="{url path="/admin/module/OpenSearchServerSearch/actions/indexAll"}" method="post">
+                    <input type="submit" class="btn btn-warning" value="Index all products" />
+                </form>
             </div>
         </div>
     </div>

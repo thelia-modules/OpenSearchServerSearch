@@ -96,7 +96,8 @@ class ConfigurationForm extends BaseForm
                     'label' => $this->trans('Index to use'),
                     'data' => OpenSearchServerConfigQuery::read('index_name', ''),
                     'label_attr' => array(
-                        'for' => 'index_name'
+                        'for' => 'index_name',
+                        'help' => $this->trans('Index will be automatically created if it does not already exist.')
                     )
                 )
             )
@@ -106,15 +107,28 @@ class ConfigurationForm extends BaseForm
                 array(
                     'constraints' => array(new NotBlank()),
                     'required' => true,
-                    'label' => $this->trans('query_template'),
+                    'label' => $this->trans('Query template'),
                     'data' => OpenSearchServerConfigQuery::read('query_template', 'search'),
                     'label_attr' => array(
                         'for' => 'query_template',
-                        'help' => $this->trans('Query template to use for searching products, created in OpenSearchServer.')
+                        'help' => $this->trans('Query template to use for searching products. If it does not already exists in index it will be automatically created from a basic template.')
                     )
                 )
             )
-            ;
+            
+            ->add(
+                'enable_search',
+                'checkbox',
+                array(
+                    'required' => false,
+                    'label' => $this->trans('Enable search with OpenSearchServer'),
+                    'data' => (boolean)OpenSearchServerConfigQuery::read('enable_search', ''),
+                    'label_attr' => array(
+                        'for' => 'enable_search',
+                        'help' => $this->trans('Enable this option when configuration is completed.')
+                    )
+                )
+            );
     }
 
     public function getName()

@@ -11,34 +11,10 @@
                     <span class="error">{$message}</span>
                 {/form_error}
             </label>
-
-            {if $multiple}
-                <span class="label-help-block">{intl d="payzen.bo.default" l='Use Ctrl+click to select (or deselect) more that one item'}</span>
-            {/if}
-
-            {if $type == 'choice'}
-                 <select {if $multiple}multiple{/if} {if $label_attr.size}size="{$label_attr.size}"{/if} {if $required}aria-required="true" required{/if} id="{$label_attr.for}" name="{$name}"class="form-control">
-                   {foreach $choices as $choice}
-                        <option value="{$choice->value}" {if (is_array($value) && in_array($choice->value, $value)) || $choice->value == $value}selected="selected"{/if}>{$choice->label}
-                    {/foreach}
-                </select>
-            {elseif $type == 'textarea'}
-                <textarea {if $label_attr.rows}rows="{$label_attr.rows}"{/if} {if $required}aria-required="true" required{/if} placeholder="{$label}" id="{$label_attr.for}" name="{$name}" class="form-control" title="{$label}" placeholder="{$label}">{$value}</textarea>
-            {elseif $type == 'money'}
-                <div class="input-group">
-                    <input type="number" {if $required}aria-required="true" required{/if} placeholder="{$label}" id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control" />
-                    <span class="input-group-addon">{loop name="input.addon" type="currency" default_only="true"}{$SYMBOL}{/loop}</span>
-                </div>
+            {if $type == 'checkbox'}
+                 : <input type="checkbox" {if $data == 1}checked="checked"{/if} {if $required}aria-required="true" required{/if} id="{$label_attr.for}" name="{$name}" class="">
             {else}
-                {$text_types = ['text', 'password', 'number', 'money', 'integer', 'time', 'date', 'datetime', 'email', 'url']}
-
-                {if in_array($type, $text_types)}
-                    {if $type == 'integer' || $type == 'money'}{$type='number'}{/if}
-
-                    <input type="{$type}" {if $required}aria-required="true" required{/if} placeholder="{$label}" id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control" />
-                {else}
-                    <div class="alert alert-danger">{intl d="payzen.bo.default" l="Unsupported field type '%type' in form-field-template.html" type=$type}</div>
-                {/if}
+                <input type="{$type}" {if $required}aria-required="true" required{/if} placeholder="{$label}" id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control" />
             {/if}
 
             {if ! empty($label_attr.help)}

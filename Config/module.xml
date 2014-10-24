@@ -2,10 +2,10 @@
 <module>
     <fullnamespace>OpenSearchServerSearch\OpenSearchServerSearch</fullnamespace>
     <descriptive locale="en_US">
-        <title>OpenSearchServer integration</title>
+        <title>OpenSearchServer - search engine</title>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>Intégration d'OpenSearchServer</title>
+        <title>OpenSearchServer - moteur de recherche</title>
     </descriptive>
     <version>0.1</version>
     <author>

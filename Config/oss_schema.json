@@ -1,0 +1,111 @@
+[
+        {
+            "name": "uniqueId",
+            "indexed": "YES",
+            "stored": "NO"
+        },
+        {
+            "name": "title",
+            "indexed": "YES",
+            "stored": "YES",
+            "analyzer": "TextAnalyzer"
+        },
+        {
+            "name": "titleStandard",
+            "indexed": "YES",
+            "stored": "NO",
+            "analyzer": "StandardAnalyzer",
+            "copyOf": [
+                "title"
+            ]
+        },
+        {
+            "name": "titleSort",
+            "indexed": "YES",
+            "stored": "NO",
+            "analyzer": "KeywordLikeAnalyzer",
+            "copyOf": [
+                "title"
+            ]
+        },
+        {
+            "name": "description",
+            "indexed": "YES",
+            "stored": "YES",
+            "analyzer": "TextAnalyzer"
+        },
+        {
+            "name": "descriptionStandard",
+            "indexed": "YES",
+            "stored": "NO",
+            "analyzer": "StandardAnalyzer",
+            "copyOf": [
+                "description"
+            ]
+        },
+        {
+            "name": "chapo",
+            "indexed": "YES",
+            "stored": "YES",
+            "analyzer": "TextAnalyzer"
+        },
+        {
+            "name": "chapoStandard",
+            "indexed": "YES",
+            "stored": "NO",
+            "analyzer": "StandardAnalyzer",
+            "copyOf": [
+                "chapo"
+            ]
+        },
+        {
+            "name": "id",
+            "indexed": "YES",
+            "stored": "NO"
+        },
+        {
+            "name": "price",
+            "indexed": "YES",
+            "stored": "YES",
+            "analyzer": "PriceAnalyzer"
+        },
+        {
+            "name": "reference",
+            "indexed": "YES",
+            "stored": "NO"
+        },
+        {
+            "name": "locale",
+            "indexed": "YES",
+            "stored": "NO"
+        },
+        {
+            "name": "currency",
+            "indexed": "YES",
+            "stored": "NO"
+        },
+        {
+            "name": "full",
+            "indexed": "YES",
+            "stored": "YES",
+            "analyzer": "TextAnalyzer",
+            "copyOf": [
+                "title",
+                "chapo",
+                "description",
+                "reference"
+            ]
+        },
+        {
+            "name": "fullStandard",
+            "indexed": "YES",
+            "stored": "NO",
+            "analyzer": "StandardAnalyzer",
+            "copyOf": [
+                "title",
+                "chapo",
+                "description",
+                "reference"
+            ]
+        }
+]
