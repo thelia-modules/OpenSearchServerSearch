@@ -49,7 +49,7 @@ class OpenSearchServerSearchHelper
 
     public static function makeProductUniqueId($locale, \Thelia\Model\Base\Product $product) {
         //concatenate locale + ref
-        return $locale.'_'.$product->getRef();
+        return $locale.'_'.$product->getId();
     }
 
     public static function indexProduct(\Thelia\Model\Base\Product $product) {
@@ -78,7 +78,6 @@ class OpenSearchServerSearchHelper
             $document = new \OpenSearchServer\Document\Document();
             $productI18nInfos = $translation->toArray();
 
-            //TODO : complete list of languages
             switch($productI18nInfos['Locale']) {
                 case 'fr_Fr':
                 case 'fr_FR':
@@ -87,6 +86,18 @@ class OpenSearchServerSearchHelper
                 case 'en_EN':
                 case 'en_US':
                     $document->lang(\OpenSearchServer\Request::LANG_EN);
+                    break;
+                case 'es_ES':
+                    $document->lang(\OpenSearchServer\Request::LANG_ES);
+                    break;
+                case 'it_IT':
+                    $document->lang(\OpenSearchServer\Request::LANG_IT);
+                    break;
+                case 'ru_RU':
+                    $document->lang(\OpenSearchServer\Request::LANG_RU);
+                    break;
+                default:
+                    $document->lang(\OpenSearchServer\Request::LANG_UNDEFINED);
                     break;
             }
             

@@ -20,14 +20,14 @@
      {  
         "field":"title",
         "mode":"PATTERN",
-        "boost":1.0,
-        "phraseBoost":1.0
+        "boost":10.0,
+        "phraseBoost":10.0
      },
      {  
         "field":"description",
         "mode":"PATTERN",
-        "boost":1.0,
-        "phraseBoost":1.0
+        "boost":6.0,
+        "phraseBoost":6.0
      },
      {  
         "field":"reference",
@@ -38,8 +38,8 @@
      {  
         "field":"chapo",
         "mode":"PATTERN",
-        "boost":1.0,
-        "phraseBoost":1.0
+        "boost":8.0,
+        "phraseBoost":8.0
      }
   ]
 }

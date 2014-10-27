@@ -141,7 +141,7 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
 
             
             //$this->getRequest()->getSession()->getFlashBag()->add('notice', $this->getTranslator()->trans('Settings have been saved.'));
-            $this->getRequest()->getSession()->getFlashBag()->add('oss', 'Settings have been saved.');
+            $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('Settings have been saved.', [], OpenSearchServerSearch::MODULE_DOMAIN));
             
             $this->redirect(URL::getInstance()->absoluteUrl($route));
             exit;
@@ -186,7 +186,7 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             $count++;
         }
         $route = '/admin/module/OpenSearchServerSearch';
-        $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('%count products have been indexed.', array('%count' => $count)));
+        $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('%count products have been indexed.', array('%count' => $count), OpenSearchServerSearch::MODULE_DOMAIN));
         $this->redirect(URL::getInstance()->absoluteUrl($route));
     }
     

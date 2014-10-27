@@ -60,7 +60,7 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
         $sort = $request->query->get('order', null);
         
         $page = $request->query->get('page', 1);
-        $limit = $request->query->get('limit', null);
+        $limit = $request->query->get('limit', 8);
         $offset = ($limit == 100000) ? 0:($page - 1) * $limit;
 
         //get locale
@@ -76,6 +76,18 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
             case 'en_EN':
             case 'en_US':
                 $lang = \OpenSearchServer\Request::LANG_EN;
+                break;
+            case 'es_ES':
+                $document->lang(\OpenSearchServer\Request::LANG_ES);
+                break;
+            case 'it_IT':
+                $document->lang(\OpenSearchServer\Request::LANG_IT);
+                break;
+            case 'ru_RU':
+                $document->lang(\OpenSearchServer\Request::LANG_RU);
+                break;
+            default:
+                $document->lang(\OpenSearchServer\Request::LANG_UNDEFINED);
                 break;
         }
         
@@ -118,10 +130,7 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
         $ids = array();
         foreach($response->getResults() as $result) {
             $ids[] = $result->getField('id');
-            echo $result->getField('title').';';
         }
-        
-        
         
         //number of pages
         $numberOfPages = ($limit > 0) ? round($response->getTotalNumberFound()/$limit) : 1;
