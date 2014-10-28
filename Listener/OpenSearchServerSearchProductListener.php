@@ -40,11 +40,11 @@ class OpenSearchServerSearchProductListener implements EventSubscriberInterface
 {
 
     public function indexProduct($event) {
-        //var_dump($event->getProduct()->getCurrentTranslation());
-        //var_dump($event);
-        //var_dump($event->getProduct());exit;
-
         OpenSearchServerSearchHelper::indexProduct($event->getProduct());
+    }
+
+    public function deleteProduct($event) {
+        OpenSearchServerSearchHelper::deleteProduct($event->getProduct());
     }
     
     /**
@@ -73,7 +73,8 @@ class OpenSearchServerSearchProductListener implements EventSubscriberInterface
             TheliaEvents::PRODUCT_UPDATE => ['indexProduct', 0],
             TheliaEvents::PRODUCT_CREATE => ['indexProduct', 0],
             TheliaEvents::IMAGE_SAVE => ['updateImage', 0],
-            TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT=> ['indexProduct', 0]
+            TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT=> ['indexProduct', 0],
+            TheliaEvents::AFTER_DELETEPRODUCT => ['deleteProduct', 0]
         );
     }
 }

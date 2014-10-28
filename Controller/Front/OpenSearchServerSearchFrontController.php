@@ -66,31 +66,32 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
         //get locale
         $locale = $request->getSession()->getLang()->getLocale();
         //fix bug with FR locale?
-        if($locale == 'fr_FR') $locale = 'fr_Fr';
-        
-        switch($locale) {
-            case 'fr_Fr':
-            case 'fr_FR':
-                $lang = \OpenSearchServer\Request::LANG_FR;
-                break;
-            case 'en_EN':
-            case 'en_US':
-                $lang = \OpenSearchServer\Request::LANG_EN;
-                break;
-            case 'es_ES':
-                $document->lang(\OpenSearchServer\Request::LANG_ES);
-                break;
-            case 'it_IT':
-                $document->lang(\OpenSearchServer\Request::LANG_IT);
-                break;
-            case 'ru_RU':
-                $document->lang(\OpenSearchServer\Request::LANG_RU);
-                break;
-            default:
-                $document->lang(\OpenSearchServer\Request::LANG_UNDEFINED);
-                break;
+        if($locale == 'fr_FR') {
+            $locale = array('fr_FR', 'fr_Fr');   
+            $lang = \OpenSearchServer\Request::LANG_FR;
         }
         
+        if(!isset($lang)) {
+            switch($locale) {
+                case 'en_EN':
+                case 'en_US':
+                    $lang = \OpenSearchServer\Request::LANG_EN;
+                    break;
+                case 'es_ES':
+                    $lang = \OpenSearchServer\Request::LANG_ES;
+                    break;
+                case 'it_IT':
+                    $lang = \OpenSearchServer\Request::LANG_IT;
+                    break;
+                case 'ru_RU':
+                    $lang = \OpenSearchServer\Request::LANG_RU;
+                    break;
+                default:
+                    $lang = \OpenSearchServer\Request::LANG_UNDEFINED;
+                    break;
+            }
+        }
+
         $index = OpensearchserverConfigQuery::read('index_name');
         $queryTemplate = OpensearchserverConfigQuery::read('query_template');
 
@@ -106,7 +107,7 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
                 //set lang of keywords
                 ->lang($lang)
                 //filter to get only documents with current locale
-                ->filterField('locale', $locale)
+                ->filterField('locale', $locale, \OpenSearchServer\Request::OPERATOR_OR)
                 ->enableLog()
                 ->query($keywords);
         //handle sorting

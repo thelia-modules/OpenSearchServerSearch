@@ -173,11 +173,21 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
     }
 
     
+    /**
+     * Called by actions buttons in configuration page
+     */
+    public function adminActionsAction() {
+        $adminAction = $this->getRequest()->request->get('adminAction');
+        if(!empty($adminAction) && is_callable(array($this, $adminAction.'Action'), true, $callable_name)) {
+            $method = $adminAction.'Action';
+            $this->$method();
+        }
+    }
     
 	/**
 	 * Index all products
      */
-    public function indexAllAction()
+    private function indexAllAction()
     {
         $products = ProductQuery::create()->findByVisible(1);
         $count = 0;
@@ -187,6 +197,26 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
         }
         $route = '/admin/module/OpenSearchServerSearch';
         $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('%count products have been indexed.', array('%count' => $count), OpenSearchServerSearch::MODULE_DOMAIN));
+        $this->redirect(URL::getInstance()->absoluteUrl($route));
+    }
+    
+	/**
+	 * Delete all products
+     */
+    private function deleteAllAction()
+    {
+        // Get name of index and handler to work with OSS API
+        $index = OpensearchserverConfigQuery::read('index_name');
+        $oss_api = OpenSearchServerSearchHelper::getHandler();
+        
+        //delete every documents from index 
+        $request = new \OpenSearchServer\Document\DeleteByQuery();
+        $request->index($index)
+                ->query('id:[* TO *]');
+        $response = $oss_api->submit($request); 
+        
+        $route = '/admin/module/OpenSearchServerSearch';
+        $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('All data have been deleted.', [], OpenSearchServerSearch::MODULE_DOMAIN));
         $this->redirect(URL::getInstance()->absoluteUrl($route));
     }
     

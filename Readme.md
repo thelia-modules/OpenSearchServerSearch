@@ -7,7 +7,6 @@ OpenSearchServer module for Thelia integrates the Open source search engine [Ope
 ## Known bugs and remaining developments
 
 * listen to all event for products to ensure proper updating of index
-* listen to delete event in order to delete document in index
 
 ## Installation
 
@@ -47,7 +46,7 @@ Once configuration is completed the checkbox __Enable search with OpenSearchServ
 
 ### Indexing products
 
-Products will be automatically indexed when created, updated or deleted.
+Products will be automatically indexed when created or updated and automatically deleted from the index when deleted.
 
 A button _Index all products_ in the module's configuration page allow for indexing of all visible products.
 

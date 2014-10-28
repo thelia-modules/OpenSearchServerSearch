@@ -12,5 +12,7 @@ return array(
     'Index will be automatically created if it does not already exist.' => 'L\'index sera créé automatiquement s\'il n\'existe pas déjà.',
     'Query template to use for searching products. If it does not already exists in index it will be automatically created from a basic template.' => 'Template de query à utiliser pour rechercher les produits. Si le template n\'existe pas il sera créé automatiquement à partir d\'un template par défaut.',
     'Enable this option when configuration is completed.' => 'Activez cette option lorsque la configuration est terminée.',
-    'Index all products' => 'Indexer tous les produits'
+    'Index all products' => 'Indexer tous les produits',
+	'Delete all data from index' => 'Supprimer toutes les données de l\'index',
+    'All data have been deleted.' => 'Toutes les données ont été supprimées.'
 );

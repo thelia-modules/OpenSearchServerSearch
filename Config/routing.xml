@@ -12,8 +12,8 @@
         <default key="_controller">OpenSearchServerSearch\Controller\Admin\OpenSearchServerSearchAdminController::configureAction</default>
     </route>
 
-    <route id="opensearchserver.admin.actions.indexAll" path="/admin/module/OpenSearchServerSearch/actions/indexAll" methods="post">
-        <default key="_controller">OpenSearchServerSearch\Controller\Admin\OpenSearchServerSearchAdminController::indexAllAction</default>
+    <route id="opensearchserver.admin.actions.indexAll" path="/admin/module/OpenSearchServerSearch/actions/adminActions" methods="post">
+        <default key="_controller">OpenSearchServerSearch\Controller\Admin\OpenSearchServerSearchAdminController::adminActionsAction</default>
     </route>
 
     <route id="opensearchserver.search" path="/search">

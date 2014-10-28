@@ -121,6 +121,23 @@ class OpenSearchServerSearchHelper
         //exit;
     }
     
+    public static function deleteProduct($product) {
+        /************************************
+         * Get name of index and handler to work with OSS API
+         ************************************/
+        $index = OpensearchserverConfigQuery::read('index_name');
+        $oss_api = OpenSearchServerSearchHelper::getHandler();
+        
+        //delete every versions of this product (all locales) 
+        $request = new \OpenSearchServer\Document\Delete();
+        $request->index($index)
+                ->field('id')
+                ->value($product->getId());
+        $response = $oss_api->submit($request); 
+
+        return $response->isSuccess();
+    }
+    
     public static function formatPrice($price) {
         return str_replace(' ', '', $price);
     }
