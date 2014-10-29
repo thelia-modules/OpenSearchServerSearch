@@ -23,7 +23,6 @@
 
 namespace OpenSearchServerSearch\Helper;
 
-
 use Thelia\Model\ProductPriceQuery;
 
 use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
@@ -35,8 +34,8 @@ use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
  */
 class OpenSearchServerSearchHelper
 {
-
-    public static function getHandler() {
+    public static function getHandler()
+    {
         $url = OpensearchserverConfigQuery::read('hostname');
         $login = OpensearchserverConfigQuery::read('login');
         $apiKey = OpensearchserverConfigQuery::read('apikey');
@@ -47,12 +46,14 @@ class OpenSearchServerSearchHelper
         return $ossApi;
     }
 
-    public static function makeProductUniqueId($locale, \Thelia\Model\Base\Product $product) {
+    public static function makeProductUniqueId($locale, \Thelia\Model\Base\Product $product)
+    {
         //concatenate locale + ref
         return $locale.'_'.$product->getId();
     }
 
-    public static function indexProduct(\Thelia\Model\Base\Product $product) {
+    public static function indexProduct(\Thelia\Model\Base\Product $product)
+    {
         /************************************
          * Get name of index and handler to work with OSS API
          ************************************/
@@ -78,7 +79,7 @@ class OpenSearchServerSearchHelper
             $document = new \OpenSearchServer\Document\Document();
             $productI18nInfos = $translation->toArray();
 
-            switch($productI18nInfos['Locale']) {
+            switch ($productI18nInfos['Locale']) {
                 case 'fr_Fr':
                 case 'fr_FR':
                     $document->lang(\OpenSearchServer\Request::LANG_FR);
@@ -121,25 +122,26 @@ class OpenSearchServerSearchHelper
         //exit;
     }
     
-    public static function deleteProduct($product) {
+    public static function deleteProduct($product)
+    {
         /************************************
          * Get name of index and handler to work with OSS API
          ************************************/
         $index = OpensearchserverConfigQuery::read('index_name');
         $oss_api = OpenSearchServerSearchHelper::getHandler();
         
-        //delete every versions of this product (all locales) 
+        //delete every versions of this product (all locales)
         $request = new \OpenSearchServer\Document\Delete();
         $request->index($index)
                 ->field('id')
                 ->value($product->getId());
-        $response = $oss_api->submit($request); 
+        $response = $oss_api->submit($request);
 
         return $response->isSuccess();
     }
     
-    public static function formatPrice($price) {
+    public static function formatPrice($price)
+    {
         return str_replace(' ', '', $price);
     }
-
 }

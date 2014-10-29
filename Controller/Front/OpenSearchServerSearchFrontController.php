@@ -23,7 +23,6 @@
 
 namespace OpenSearchServerSearch\Controller\Front;
 
-
 use Front\Front;
 use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -44,12 +43,12 @@ use Thelia\Core\Template\ParserInterface;
  */
 class OpenSearchServerSearchFrontController extends BaseFrontController
 {
-    
-    public function search() {
+    public function search()
+    {
         //if search with OSS has not been activated yet in module configuration page OSS is not used
         $searchEnabled = OpensearchserverConfigQuery::read('enable_search');
-        if(!$searchEnabled) {
-            //display results      
+        if (!$searchEnabled) {
+            //display results
             return $this->render('search');
         }
         
@@ -66,13 +65,13 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
         //get locale
         $locale = $request->getSession()->getLang()->getLocale();
         //fix bug with FR locale?
-        if($locale == 'fr_FR') {
-            $locale = array('fr_FR', 'fr_Fr');   
+        if ($locale == 'fr_FR') {
+            $locale = array('fr_FR', 'fr_Fr');
             $lang = \OpenSearchServer\Request::LANG_FR;
         }
         
-        if(!isset($lang)) {
-            switch($locale) {
+        if (!isset($lang)) {
+            switch ($locale) {
                 case 'en_EN':
                 case 'en_US':
                     $lang = \OpenSearchServer\Request::LANG_EN;
@@ -111,7 +110,7 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
                 ->enableLog()
                 ->query($keywords);
         //handle sorting
-        switch($sort) {
+        switch ($sort) {
             case 'alpha':
                 $request->sort('titleSort', \OpenSearchServer\Search\Search::SORT_ASC);
                 break;
@@ -129,16 +128,16 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
         $response = $oss_api->submit($request);
         
         $ids = array();
-        foreach($response->getResults() as $result) {
+        foreach ($response->getResults() as $result) {
             $ids[] = $result->getField('id');
         }
         
         //number of pages
         $numberOfPages = ($limit > 0) ? round($response->getTotalNumberFound()/$limit) : 1;
         
-        //display results      
+        //display results
         return $this->render('oss_results', array(
-        	'module_code' => 'OpenSearchServerSearch',
+            'module_code' => 'OpenSearchServerSearch',
             'keywords' => $keywords,
             'total' => $response->getTotalNumberFound(),
             'results' => $response->getResults(),
@@ -146,5 +145,4 @@ class OpenSearchServerSearchFrontController extends BaseFrontController
             'numberOfPages' => $numberOfPages
         ));
     }
-    
 }

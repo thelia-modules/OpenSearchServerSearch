@@ -38,12 +38,13 @@ use OpenSearchServerSearch\Helper\OpenSearchServerSearchHelper;
  */
 class OpenSearchServerSearchProductListener implements EventSubscriberInterface
 {
-
-    public function indexProduct($event) {
+    public function indexProduct($event)
+    {
         OpenSearchServerSearchHelper::indexProduct($event->getProduct());
     }
 
-    public function deleteProduct($event) {
+    public function deleteProduct($event)
+    {
         OpenSearchServerSearchHelper::deleteProduct($event->getProduct());
     }
     
@@ -78,4 +79,3 @@ class OpenSearchServerSearchProductListener implements EventSubscriberInterface
         );
     }
 }
-

@@ -6,5 +6,4 @@ use OpenSearchServerSearch\Model\Base\OpensearchserverConfig as BaseOpensearchse
 
 class OpensearchserverConfig extends BaseOpensearchserverConfig
 {
-
 }

@@ -23,7 +23,6 @@
 
 namespace OpenSearchServerSearch\Controller\Admin;
 
-
 use Thelia\Model\Base\ProductQuery;
 
 use OpenSearchServerSearch\Form\ConfigurationForm;
@@ -44,10 +43,11 @@ use Thelia\Tools\URL;
  */
 class OpenSearchServerSearchAdminController extends BaseAdminController
 {
-
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
     
         return $this->renderTemplate();
     }
@@ -68,14 +68,13 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
         $configurationForm = new ConfigurationForm($this->getRequest());
 
         try {
-
             // Check the form against constraints violations
             $form = $this->validateForm($configurationForm, "POST");
 
             // Get the form field values
             $data = $form->getData();
 
-            foreach($data as $name => $value) {
+            foreach ($data as $name => $value) {
                 if (is_array($value)) {
                     $value = implode(';', $value);
                 }
@@ -92,7 +91,7 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             $request->index($index);
             $response = $oss_api->submit($request);
             //index doesn't exist, create it
-            if(!$response->isSuccess()) {
+            if (!$response->isSuccess()) {
                 $this->createIndex($index);
                 $indexCreated = true;
             }
@@ -102,13 +101,13 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             $request = new \OpenSearchServer\Analyzer\Get();
             $request->index($index)
                     ->name($analyzerName);
-            $response = $oss_api->submit($request); 
-            if(!$response->isSuccess()) {
+            $response = $oss_api->submit($request);
+            if (!$response->isSuccess()) {
                 $this->createAnalyzer($index, $analyzerName);
             }
             
             //if index has just been created, create its schema
-            if($indexCreated) {
+            if ($indexCreated) {
                 $this->createSchema($index);
             }
             
@@ -118,7 +117,7 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             $request->index($index)
                     ->name($queryTemplate);
             $response = $oss_api->submit($request);
-            if(!$response->isSuccess()) {
+            if (!$response->isSuccess()) {
                 $this->createQueryTemplate($index, $queryTemplate);
             }
             
@@ -133,8 +132,7 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             if ($this->getRequest()->get('save_mode') == 'stay') {
                 // If we have to stay on the same page, redisplay the configuration page/
                 $route = '/admin/module/OpenSearchServerSearch';
-            }
-            else {
+            } else {
                 // If we have to close the page, go back to the module back-office page.
                 $route = '/admin/modules';
             }
@@ -145,14 +143,12 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             
             $this->redirect(URL::getInstance()->absoluteUrl($route));
             exit;
-
         } catch (FormValidationException $ex) {
             // Form cannot be validated. Create the error message using
             // the BaseAdminController helper method.
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
-              // Any other error
+        } catch (\Exception $ex) {
+            // Any other error
              $error_msg = $ex->getMessage();
         }
 
@@ -176,22 +172,23 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
     /**
      * Called by actions buttons in configuration page
      */
-    public function adminActionsAction() {
+    public function adminActionsAction()
+    {
         $adminAction = $this->getRequest()->request->get('adminAction');
-        if(!empty($adminAction) && is_callable(array($this, $adminAction.'Action'), true, $callable_name)) {
+        if (!empty($adminAction) && is_callable(array($this, $adminAction.'Action'), true, $callable_name)) {
             $method = $adminAction.'Action';
             $this->$method();
         }
     }
     
-	/**
+    /**
 	 * Index all products
      */
     private function indexAllAction()
     {
         $products = ProductQuery::create()->findByVisible(1);
         $count = 0;
-        foreach($products as $product) {
+        foreach ($products as $product) {
             OpenSearchServerSearchHelper::indexProduct($product);
             $count++;
         }
@@ -200,7 +197,7 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
         $this->redirect(URL::getInstance()->absoluteUrl($route));
     }
     
-	/**
+    /**
 	 * Delete all products
      */
     private function deleteAllAction()
@@ -209,11 +206,11 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
         $index = OpensearchserverConfigQuery::read('index_name');
         $oss_api = OpenSearchServerSearchHelper::getHandler();
         
-        //delete every documents from index 
+        //delete every documents from index
         $request = new \OpenSearchServer\Document\DeleteByQuery();
         $request->index($index)
                 ->query('id:[* TO *]');
-        $response = $oss_api->submit($request); 
+        $response = $oss_api->submit($request);
         
         $route = '/admin/module/OpenSearchServerSearch';
         $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('All data have been deleted.', [], OpenSearchServerSearch::MODULE_DOMAIN));
@@ -224,7 +221,8 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
      * Create an index in OpenSearchServer's instance
      * @param string $index Name of the index to create
      */
-    private function createIndex($index) {
+    private function createIndex($index)
+    {
         //get handle to work with the API
         $oss_api = OpenSearchServerSearchHelper::getHandler();
         
@@ -236,11 +234,12 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
     }
 
     
-	/**
+    /**
      * Create schema in an index
      * @param string $index Name of the index to use
      */
-    private function createSchema($index) {
+    private function createSchema($index)
+    {
         //get handle to work with the API
         $oss_api = OpenSearchServerSearchHelper::getHandler();
    
@@ -263,7 +262,8 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
      * @param string $index Name of the index to work with
      * @param string $queryTemplate Name of the template to create
      */
-    private function createQueryTemplate($index, $queryTemplate) {
+    private function createQueryTemplate($index, $queryTemplate)
+    {
         //get handle to work with the API
         $oss_api = OpenSearchServerSearchHelper::getHandler();
         
@@ -279,11 +279,12 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
      * Create an analyzer
      * @param string $index Name of the index to create
      */
-    private function createAnalyzer($index, $analyzer) {
+    private function createAnalyzer($index, $analyzer)
+    {
         //get handle to work with the API
         $oss_api = OpenSearchServerSearchHelper::getHandler();
         
-        if(is_file(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_analyzer_'.$analyzer.'.json') && is_readable(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_analyzer_'.$analyzer.'.json')) {
+        if (is_file(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_analyzer_'.$analyzer.'.json') && is_readable(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_analyzer_'.$analyzer.'.json')) {
             $request = new \OpenSearchServer\Analyzer\Create(null, file_get_contents(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/oss_analyzer_'.$analyzer.'.json'));
             $request->index($index)
                     ->name($analyzer);
@@ -291,7 +292,6 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             return $response->isSuccess();
         }
         return false;
-       
     }
     
     protected function renderTemplate()
@@ -304,5 +304,4 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             )
         );
     }
-    
 }

@@ -40,7 +40,8 @@ use Thelia\Model\Module;
  */
 class ConfigurationForm extends BaseForm
 {
-    protected function trans($str, $params = []) {
+    protected function trans($str, $params = [])
+    {
         return Translator::getInstance()->trans($str, $params, OpenSearchServerSearch::MODULE_DOMAIN);
     }
 

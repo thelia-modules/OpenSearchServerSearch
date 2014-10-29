@@ -17,7 +17,7 @@ use OpenSearchServerSearch\Model\Base\OpensearchserverConfigQuery as BaseOpensea
  */
 class OpensearchserverConfigQuery extends BaseOpensearchserverConfigQuery
 {
-	/**
+    /**
      * Return a configuration variable value, or a default value if the variable was not found
      *
      * @param string $name the configuration variable name
