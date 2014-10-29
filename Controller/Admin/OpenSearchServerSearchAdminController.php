@@ -207,9 +207,9 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             OpenSearchServerSearchHelper::indexProduct($product);
             $count++;
         }
-        $route = '/admin/module/OpenSearchServerSearch';
+
         $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('%count products have been indexed.', array('%count' => $count), OpenSearchServerSearch::MODULE_DOMAIN));
-        return RedirectResponse::create(URL::getInstance()->absoluteUrl($route));
+        return $this->redirectToHome();
     }
     
     /**
@@ -227,9 +227,9 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
                 ->query('id:[* TO *]');
         $response = $oss_api->submit($request);
         
-        $route = '/admin/module/OpenSearchServerSearch';
+
         $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('All data have been deleted.', [], OpenSearchServerSearch::MODULE_DOMAIN));
-        return RedirectResponse::create(URL::getInstance()->absoluteUrl($route));
+        return $this->redirectToHome();
     }
     
     /**
@@ -311,12 +311,24 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
     
     protected function renderTemplate()
     {
+        $flash = $this->getRequest()->getSession()->getFlashBag()->get('oss');
+        $flashMessage = isset($flash[0]) ? $this->getRequest()->getSession()->getFlashBag()->get('oss')[0] : null;
         return $this->render(
             'module-configure',
             array(
                 'module_code' => 'OpenSearchServerSearch',
-                'flash_message' => $this->getRequest()->getSession()->getFlashBag()->get('oss')[0]
+                'flash_message' => $flashMessage
             )
         );
+    }
+
+    /**
+     * redirect to OpenSearchServer admin home
+     *
+     * @return \Symfony\Component\HttpFoundation\Response|static
+     */
+    protected function redirectToHome()
+    {
+        return RedirectResponse::create(URL::getInstance()->absoluteUrl('/admin/module/OpenSearchServerSearch'));
     }
 }
