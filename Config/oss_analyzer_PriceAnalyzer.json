@@ -1,0 +1,23 @@
+{
+  "queryTokenizer":{  
+     "name":"KeywordTokenizer"
+  },
+  "indexTokenizer":{  
+     "name":"KeywordTokenizer"
+  },
+  "filters":[  
+     {  
+        "name":"NumberFormatFilter",
+        "properties":{  
+           "numberFormat":"'>'0000000000.##########;'<'0000000000.##########",
+           "outputDecimalSeparator":".",
+           "inputDecimalSeparator":",",
+           "inputGroupSeparator":"",
+           "defaultValue":"",
+           "outputGroupSeparator":"",
+           "inputNumberFormat":"##0,00"
+        },
+        "scope":"QUERY_INDEX"
+     }
+  ]
+}

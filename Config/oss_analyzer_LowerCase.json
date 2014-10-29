@@ -1,0 +1,14 @@
+{
+  "queryTokenizer":{  
+     "name":"KeywordTokenizer"
+  },
+  "indexTokenizer":{  
+     "name":"KeywordTokenizer"
+  },
+  "filters":[  
+     {  
+        "name":"LowerCaseFilter",
+        "scope":"QUERY_INDEX"
+     }
+  ]
+}

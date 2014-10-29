@@ -10,16 +10,20 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace OpenSearchServer;
+namespace OpenSearchServerSearch;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Install\Database;
 use Thelia\Module\BaseModule;
 
-class OpenSearchServer extends BaseModule
+class OpenSearchServerSearch extends BaseModule
 {
-    /*
-     * You may now override BaseModuleInterface methods, such as:
-     * install, destroy, preActivation, postActivation, preDeactivation, postDeactivation
-     *
-     * Have fun !
-     */
+    /** The module domain for internationalisation */
+    const MODULE_DOMAIN = "opensearchserversearch";
+    
+    public function postActivation(ConnectionInterface $con = null)
+    {
+        $database = new Database($con->getWrappedConnection());
+        $database->insertSql(null, array(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/thelia.sql'));
+    }
 }
