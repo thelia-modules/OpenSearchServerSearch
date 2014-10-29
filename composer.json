@@ -14,7 +14,7 @@
         "opensearchserver/opensearchserver": "3.0.*"
     },
     "extra": {
-        "installer-name": "OpenSearchServer_Search",
+        "installer-name": "OpenSearchServerSearch",
         "branch-alias": {
             "dev-master": "1.0-dev"
         }
