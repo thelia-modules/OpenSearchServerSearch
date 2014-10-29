@@ -23,9 +23,9 @@
 
 namespace OpenSearchServerSearch\Helper;
 
-use Thelia\Model\ProductPriceQuery;
-
 use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
+use Thelia\Model\Product;
+use Thelia\Model\ProductPriceQuery;
 
 /**
  * Class OpenSearchServerSearchHelper
@@ -46,13 +46,13 @@ class OpenSearchServerSearchHelper
         return $ossApi;
     }
 
-    public static function makeProductUniqueId($locale, \Thelia\Model\Base\Product $product)
+    public static function makeProductUniqueId($locale, Product $product)
     {
         //concatenate locale + ref
         return $locale.'_'.$product->getId();
     }
 
-    public static function indexProduct(\Thelia\Model\Base\Product $product)
+    public static function indexProduct(Product $product)
     {
         /************************************
          * Get name of index and handler to work with OSS API
@@ -105,7 +105,7 @@ class OpenSearchServerSearchHelper
             $document   ->field('uniqueId', OpenSearchServerSearchHelper::makeProductUniqueId($productI18nInfos['Locale'], $product))
                         ->field('id', $product->getId())
                         ->field('title', $productI18nInfos['Title'])
-                        ->field('locale',  $productI18nInfos['Locale'])
+                        ->field('locale', $productI18nInfos['Locale'])
                         ->field('description', $productI18nInfos['Description'])
                         ->field('chapo', $productI18nInfos['Chapo'])
                         ->field('price', self::formatPrice($price['Price']))
@@ -122,7 +122,7 @@ class OpenSearchServerSearchHelper
         //exit;
     }
     
-    public static function deleteProduct($product)
+    public static function deleteProduct(Product $product)
     {
         /************************************
          * Get name of index and handler to work with OSS API

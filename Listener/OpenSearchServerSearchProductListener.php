@@ -25,6 +25,7 @@ namespace OpenSearchServerSearch\Listener;
 
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 
+use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Log\Tlog;
 
 use Thelia\Core\Event\TheliaEvents;
@@ -38,12 +39,12 @@ use OpenSearchServerSearch\Helper\OpenSearchServerSearchHelper;
  */
 class OpenSearchServerSearchProductListener implements EventSubscriberInterface
 {
-    public function indexProduct($event)
+    public function indexProduct(ProductUpdateEvent $event)
     {
         OpenSearchServerSearchHelper::indexProduct($event->getProduct());
     }
 
-    public function deleteProduct($event)
+    public function deleteProduct(ProductEvent $event)
     {
         OpenSearchServerSearchHelper::deleteProduct($event->getProduct());
     }
@@ -73,7 +74,7 @@ class OpenSearchServerSearchProductListener implements EventSubscriberInterface
         return array(
             TheliaEvents::PRODUCT_UPDATE => ['indexProduct', 0],
             TheliaEvents::PRODUCT_CREATE => ['indexProduct', 0],
-            TheliaEvents::IMAGE_SAVE => ['updateImage', 0],
+            //TheliaEvents::IMAGE_SAVE => ['updateImage', 0],
             TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT=> ['indexProduct', 0],
             TheliaEvents::AFTER_DELETEPRODUCT => ['deleteProduct', 0]
         );
