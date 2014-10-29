@@ -23,10 +23,10 @@
 
 namespace OpenSearchServerSearch\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Model\Base\ProductQuery;
-
 use OpenSearchServerSearch\Form\ConfigurationForm;
-use OpenSearchServerSearch\Model\OpenSearchServerConfigQuery;
+use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
 use OpenSearchServerSearch\OpenSearchServerSearch;
 use OpenSearchServerSearch\Helper\OpenSearchServerSearchHelper;
 use Thelia\Controller\Admin\BaseAdminController;
@@ -34,7 +34,6 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Tools\URL;
-
 
 /**
  * Class OpenSearchServerSearchAdminController
@@ -78,7 +77,7 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
                 if (is_array($value)) {
                     $value = implode(';', $value);
                 }
-                OpenSearchServerConfigQuery::set($name, $value);
+                OpensearchserverConfigQuery::set($name, $value);
             }
         
             //get handle to work with the API
@@ -125,7 +124,7 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             $this->adminLogAppend(
                 "opensearchserversearch.configuration.message",
                 AccessManager::UPDATE,
-                sprintf("OpenSearchServer configuration updated")
+                "OpenSearchServer configuration updated"
             );
 
             // Redirect to the success URL,
@@ -140,9 +139,8 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             
             //$this->getRequest()->getSession()->getFlashBag()->add('notice', $this->getTranslator()->trans('Settings have been saved.'));
             $this->getRequest()->getSession()->getFlashBag()->add('oss', $this->getTranslator()->trans('Settings have been saved.', [], OpenSearchServerSearch::MODULE_DOMAIN));
-            
-            $this->redirect(URL::getInstance()->absoluteUrl($route));
-            exit;
+
+            return RedirectResponse::create(URL::getInstance()->absoluteUrl($route));
         } catch (FormValidationException $ex) {
             // Form cannot be validated. Create the error message using
             // the BaseAdminController helper method.
@@ -300,7 +298,7 @@ class OpenSearchServerSearchAdminController extends BaseAdminController
             'module-configure',
             array(
                 'module_code' => 'OpenSearchServerSearch',
-                'flash_message' => $this->getRequest()->getSession()->getFlash('oss')
+                'flash_message' => $this->getRequest()->getSession()->getFlashBag()->get('oss')
             )
         );
     }

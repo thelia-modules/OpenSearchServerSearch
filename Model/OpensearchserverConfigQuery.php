@@ -4,7 +4,6 @@ namespace OpenSearchServerSearch\Model;
 
 use OpenSearchServerSearch\Model\Base\OpensearchserverConfigQuery as BaseOpensearchserverConfigQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'opensearchserver_config' table.
  *

@@ -23,7 +23,7 @@
 
 namespace OpenSearchServerSearch\Form;
 
-use OpenSearchServerSearch\Model\OpenSearchServerConfigQuery;
+use OpenSearchServerSearch\Model\OpensearchserverConfigQuery;
 use OpenSearchServerSearch\OpenSearchServerSearch;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
@@ -55,7 +55,7 @@ class ConfigurationForm extends BaseForm
                     'constraints' => array(new NotBlank()),
                     'required' => true,
                     'label' => $this->trans('OpenSearchServer instance URL'),
-                    'data' => OpenSearchServerConfigQuery::read('hostname', 'http://localhost:9090'),
+                    'data' => OpensearchserverConfigQuery::read('hostname', 'http://localhost:9090'),
                     'label_attr' => array(
                         'for' => 'hostname',
                         'help' => $this->trans('URL to access your OpenSearchServer instance. Please include port information.')
@@ -69,7 +69,7 @@ class ConfigurationForm extends BaseForm
                     'constraints' => array(new NotBlank()),
                     'required' => true,
                     'label' => $this->trans('Login'),
-                    'data' => OpenSearchServerConfigQuery::read('login', ''),
+                    'data' => OpensearchserverConfigQuery::read('login', ''),
                     'label_attr' => array(
                         'for' => 'login'
                     )
@@ -82,7 +82,7 @@ class ConfigurationForm extends BaseForm
                     'constraints' => array(new NotBlank()),
                     'required' => true,
                     'label' => $this->trans('API Key'),
-                    'data' => OpenSearchServerConfigQuery::read('apikey', ''),
+                    'data' => OpensearchserverConfigQuery::read('apikey', ''),
                     'label_attr' => array(
                         'for' => 'apikey'
                     )
@@ -95,7 +95,7 @@ class ConfigurationForm extends BaseForm
                     'constraints' => array(new NotBlank()),
                     'required' => true,
                     'label' => $this->trans('Index to use'),
-                    'data' => OpenSearchServerConfigQuery::read('index_name', ''),
+                    'data' => OpensearchserverConfigQuery::read('index_name', ''),
                     'label_attr' => array(
                         'for' => 'index_name',
                         'help' => $this->trans('Index will be automatically created if it does not already exist.')
@@ -109,7 +109,7 @@ class ConfigurationForm extends BaseForm
                     'constraints' => array(new NotBlank()),
                     'required' => true,
                     'label' => $this->trans('Query template'),
-                    'data' => OpenSearchServerConfigQuery::read('query_template', 'search'),
+                    'data' => OpensearchserverConfigQuery::read('query_template', 'search'),
                     'label_attr' => array(
                         'for' => 'query_template',
                         'help' => $this->trans('Query template to use for searching products. If it does not already exists in index it will be automatically created from a basic template.')
@@ -123,7 +123,7 @@ class ConfigurationForm extends BaseForm
                 array(
                     'required' => false,
                     'label' => $this->trans('Enable search with OpenSearchServer'),
-                    'data' => (boolean)OpenSearchServerConfigQuery::read('enable_search', ''),
+                    'data' => (boolean)OpensearchserverConfigQuery::read('enable_search', ''),
                     'label_attr' => array(
                         'for' => 'enable_search',
                         'help' => $this->trans('Enable this option when configuration is completed.')

@@ -24,6 +24,6 @@ class OpenSearchServerSearch extends BaseModule
     public function postActivation(ConnectionInterface $con = null)
     {
         $database = new Database($con->getWrappedConnection());
-        $database->insertSql(null, array(THELIA_ROOT . '/local/modules/OpenSearchServerSearch/Config/thelia.sql'));
+        $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
     }
 }
